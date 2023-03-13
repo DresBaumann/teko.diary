@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Teko.Diary.Models;
 
 namespace Teko.Diary.Data
 {
@@ -9,5 +10,8 @@ namespace Teko.Diary.Data
 			: base(options)
 		{
 		}
+
+		public DbSet<Teko.Diary.Models.Tag> Tag { get; set; }
+		public DbSet<Teko.Diary.Models.Diary> Diary { get; set; }
 	}
 }

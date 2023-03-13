@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Teko.Diary.Data;
 
@@ -11,9 +12,10 @@ using Teko.Diary.Data;
 namespace Teko.Diary.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230111143710_Add-Diary-Name")]
+    partial class AddDiaryName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -257,7 +259,7 @@ namespace Teko.Diary.Data.Migrations
                     b.Property<DateTimeOffset>("Date")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<int>("DiaryId")
+                    b.Property<int?>("DiaryId")
                         .HasColumnType("int");
 
                     b.Property<string>("ImagePath")
@@ -359,13 +361,9 @@ namespace Teko.Diary.Data.Migrations
 
             modelBuilder.Entity("Teko.Diary.Models.Entry", b =>
                 {
-                    b.HasOne("Teko.Diary.Models.Diary", "Diary")
+                    b.HasOne("Teko.Diary.Models.Diary", null)
                         .WithMany("Entries")
-                        .HasForeignKey("DiaryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Diary");
+                        .HasForeignKey("DiaryId");
                 });
 
             modelBuilder.Entity("Teko.Diary.Models.Tag", b =>
