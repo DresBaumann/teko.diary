@@ -3,13 +3,13 @@
 
 @{
     ViewData["Title"] = "Create";
+    //Model.Date = DateTime.Parse(ViewData["Date"].ToString());
 }
 <script>
     $(".selector").datepicker("setDate", @ViewData["Date"]);
+    console.log(@ViewData["Date"]);
 </script>
-<h1>Create</h1>
-
-<h4>Entry</h4>
+<h1>Neuer Tagebucheintrag</h1>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -53,7 +53,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Zurück</a>
 </div>
 
 @section Scripts {

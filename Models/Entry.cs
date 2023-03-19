@@ -10,7 +10,8 @@ public class Entry
 	[Required] public DateTime Date { get; set; }
 	[Required] [StringLength(20)] public string Title { get; set; } = null!;
 	[Required] [StringLength(1000)] public string Text { get; set; } = null!;
-	public virtual ICollection<Tag>? Tags { get; set; }
+
+	[MaxLength(3)] public virtual ICollection<Tag>? Tags { get; set; }
 
 
 	public virtual int DiaryId { get; set; }

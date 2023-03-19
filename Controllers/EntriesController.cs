@@ -63,6 +63,10 @@ namespace Teko.Diary.Controllers
 				return NotFound();
 			}
 
+			var tagIds = await _context.TagAssignment.Where(t => t.EntryId == entry.Id).Select(t => t.TagId)
+				.ToListAsync();
+			var tags = await _context.Tag.Where(t => tagIds.Contains(t.Id)).ToListAsync();
+			entry.Tags = tags;
 			return View(entry);
 		}
 
@@ -76,7 +80,9 @@ namespace Teko.Diary.Controllers
 
 			ViewData["Date"] = DateTime.Now;
 
-			ViewData["DiaryId"] = id == null ? new SelectList(_context.Diary, "Id", "Name") : id;
+			ViewData["DiaryId"] = id == null
+				? new SelectList(_context.Diary, "Id", "Name")
+				: new SelectList(_context.Diary.Where(d => d.Id == id), "Id", "Name");
 			ViewData["Tags"] = new SelectList(_context.Tag, "Id", "Name");
 			return View();
 		}
@@ -92,6 +98,9 @@ namespace Teko.Diary.Controllers
 		{
 			if (ModelState.IsValid)
 			{
+				var tags = await _context.Tag.Where(t => tagIds.Contains(t.Id)).ToListAsync();
+				entry.Tags = tags;
+
 				_context.Add(entry);
 				await _context.SaveChangesAsync();
 
@@ -109,8 +118,6 @@ namespace Teko.Diary.Controllers
 				return RedirectToAction(nameof(Index));
 			}
 
-			var tags = await _context.Tag.Where(t => tagIds.Contains(t.Id)).ToListAsync();
-			entry.Tags = tags;
 
 			ViewData["DiaryId"] = new SelectList(_context.Diary, "Id", "Id", entry.DiaryId);
 			return View(entry);
