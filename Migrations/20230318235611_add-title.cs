@@ -2,16 +2,17 @@
 
 #nullable disable
 
-namespace Teko.Diary.Data.Migrations
+namespace Teko.Diary.Migrations
 {
-    public partial class AddDiaryName : Migration
+    public partial class addtitle : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "Name",
-                table: "Diary",
-                type: "nvarchar(max)",
+                name: "Title",
+                table: "Entry",
+                type: "nvarchar(1000)",
+                maxLength: 1000,
                 nullable: false,
                 defaultValue: "");
         }
@@ -19,8 +20,8 @@ namespace Teko.Diary.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Name",
-                table: "Diary");
+                name: "Title",
+                table: "Entry");
         }
     }
 }

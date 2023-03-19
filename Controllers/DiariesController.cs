@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,37 +12,25 @@ using Teko.Diary.Models;
 
 namespace Teko.Diary.Controllers
 {
+	[Authorize]
 	public class DiariesController : Controller
 	{
 		private readonly ApplicationDbContext _context;
+		private readonly UserManager<IdentityUser> _userManager;
 
-		public DiariesController(ApplicationDbContext context)
+		public DiariesController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
 		{
 			_context = context;
+			_userManager = userManager;
 		}
 
 		// GET: Diaries
 		public async Task<IActionResult> Index()
 		{
-			return View(await _context.Diary.ToListAsync());
-		}
-
-		// GET: Diaries/Details/5
-		public async Task<IActionResult> Details(int? id)
-		{
-			if (id == null || _context.Diary == null)
-			{
-				return NotFound();
-			}
-
-			var diary = await _context.Diary
-				.FirstOrDefaultAsync(m => m.Id == id);
-			if (diary == null)
-			{
-				return NotFound();
-			}
-
-			return View(diary);
+			IdentityUser? user = await _userManager.GetUserAsync(HttpContext.User);
+			return _context.Diary != null
+				? View(await _context.Diary.Where(d => d.User.Id == user.Id).ToListAsync())
+				: Problem("Entity set 'ApplicationDbContext.Diary'  is null.");
 		}
 
 		// GET: Diaries/Create
@@ -56,6 +46,9 @@ namespace Teko.Diary.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Create([Bind("Id,Name")] Models.Diary diary)
 		{
+			IdentityUser? user = await _userManager.GetUserAsync(HttpContext.User);
+			diary.User = user;
+
 			if (ModelState.IsValid)
 			{
 				_context.Add(diary);
@@ -80,6 +73,11 @@ namespace Teko.Diary.Controllers
 				return NotFound();
 			}
 
+			if (diary?.User?.Id != null && !await IsAuthorized(diary?.User?.Id))
+			{
+				return Unauthorized();
+			}
+
 			return View(diary);
 		}
 
@@ -93,6 +91,11 @@ namespace Teko.Diary.Controllers
 			if (id != diary.Id)
 			{
 				return NotFound();
+			}
+
+			if (diary?.User?.Id != null && !await IsAuthorized(diary?.User?.Id))
+			{
+				return Unauthorized();
 			}
 
 			if (ModelState.IsValid)
@@ -135,6 +138,11 @@ namespace Teko.Diary.Controllers
 				return NotFound();
 			}
 
+			if (diary?.User?.Id != null && !await IsAuthorized(diary?.User?.Id))
+			{
+				return Unauthorized();
+			}
+
 			return View(diary);
 		}
 
@@ -154,13 +162,24 @@ namespace Teko.Diary.Controllers
 				_context.Diary.Remove(diary);
 			}
 
+			if (diary?.User?.Id != null && !await IsAuthorized(diary?.User?.Id))
+			{
+				return Unauthorized();
+			}
+
 			await _context.SaveChangesAsync();
 			return RedirectToAction(nameof(Index));
 		}
 
+		private async Task<bool> IsAuthorized(string id)
+		{
+			IdentityUser? user = await _userManager.GetUserAsync(HttpContext.User);
+			return user.Id == id;
+		}
+
 		private bool DiaryExists(int id)
 		{
-			return _context.Diary.Any(e => e.Id == id);
+			return (_context.Diary?.Any(e => e.Id == id)).GetValueOrDefault();
 		}
 	}
 }

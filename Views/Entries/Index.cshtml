@@ -1,0 +1,103 @@
+﻿@model IEnumerable<Teko.Diary.Models.Entry>
+@inject IJsonHelper Json;
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+        
+        var eventsSerialized = @Json.Serialize(Model);
+
+        var events = [];
+        eventsSerialized.forEach((event, index) => {
+            parsedDate = moment(event.date).format('YYYY-MM-DD');
+
+
+            events.push({
+                title: event.title,
+                start: `${parsedDate}`,
+                url: `/Entries/Details/${event.id}`,
+            });
+        });
+
+        console.log(events);
+
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            contentHeight: 400,
+            firstDay: 1,
+            locale: 'de',
+            dateClick: function(info) {
+                alert('Clicked on: ' + info.dateStr);
+                var year = moment(info.dateStr).format('YYYY');
+                var month = moment(info.dateStr).format('MM');
+                var day = moment(info.dateStr).format('DD');
+                window.location.href = `/Entries/Create?id=${2}&date=${info.dateStr}`;
+            },
+            events: events,
+        });
+        calendar.render();
+
+    });
+
+</script>
+
+<div id='calendar'></div>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Text)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Diary)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ImagePath)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Text)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Diary.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ImagePath)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

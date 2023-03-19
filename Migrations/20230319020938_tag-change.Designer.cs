@@ -9,17 +9,17 @@ using Teko.Diary.Data;
 
 #nullable disable
 
-namespace Teko.Diary.Data.Migrations
+namespace Teko.Diary.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230111143710_Add-Diary-Name")]
-    partial class AddDiaryName
+    [Migration("20230319020938_tag-change")]
+    partial class tagchange
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.12")
+                .HasAnnotation("ProductVersion", "6.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -256,10 +256,10 @@ namespace Teko.Diary.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<DateTimeOffset>("Date")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int?>("DiaryId")
+                    b.Property<int>("DiaryId")
                         .HasColumnType("int");
 
                     b.Property<string>("ImagePath")
@@ -269,6 +269,11 @@ namespace Teko.Diary.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
 
@@ -297,6 +302,29 @@ namespace Teko.Diary.Data.Migrations
                     b.HasIndex("EntryId");
 
                     b.ToTable("Tag");
+                });
+
+            modelBuilder.Entity("Teko.Diary.Models.TagAssignment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("EntryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EntryId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("TagAssignment");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -361,9 +389,13 @@ namespace Teko.Diary.Data.Migrations
 
             modelBuilder.Entity("Teko.Diary.Models.Entry", b =>
                 {
-                    b.HasOne("Teko.Diary.Models.Diary", null)
+                    b.HasOne("Teko.Diary.Models.Diary", "Diary")
                         .WithMany("Entries")
-                        .HasForeignKey("DiaryId");
+                        .HasForeignKey("DiaryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Diary");
                 });
 
             modelBuilder.Entity("Teko.Diary.Models.Tag", b =>
@@ -371,6 +403,25 @@ namespace Teko.Diary.Data.Migrations
                     b.HasOne("Teko.Diary.Models.Entry", null)
                         .WithMany("Tags")
                         .HasForeignKey("EntryId");
+                });
+
+            modelBuilder.Entity("Teko.Diary.Models.TagAssignment", b =>
+                {
+                    b.HasOne("Teko.Diary.Models.Entry", "Entry")
+                        .WithMany()
+                        .HasForeignKey("EntryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Teko.Diary.Models.Tag", "Tag")
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Entry");
+
+                    b.Navigation("Tag");
                 });
 
             modelBuilder.Entity("Teko.Diary.Models.Diary", b =>

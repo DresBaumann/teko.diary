@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Build.Framework;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace Teko.Diary.Models
 {
@@ -7,9 +7,9 @@ namespace Teko.Diary.Models
 	{
 		public int Id { get; set; }
 
-		[Required] public string Name { get; set; } = null!;
+		[Microsoft.Build.Framework.Required] public string Name { get; set; } = null!;
 
-		public IdentityUser User { get; set; } = null!;
-		public List<Entry>? Entries { get; set; }
+		public IdentityUser? User { get; set; } = null!;
+		public virtual ICollection<Entry>? Entries { get; set; }
 	}
 }

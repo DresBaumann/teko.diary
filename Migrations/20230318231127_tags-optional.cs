@@ -2,9 +2,9 @@
 
 #nullable disable
 
-namespace Teko.Diary.Data.Migrations
+namespace Teko.Diary.Migrations
 {
-    public partial class UpdateDiary : Migration
+    public partial class tagsoptional : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

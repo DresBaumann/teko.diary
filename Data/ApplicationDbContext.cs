@@ -13,5 +13,7 @@ namespace Teko.Diary.Data
 
 		public DbSet<Teko.Diary.Models.Tag> Tag { get; set; }
 		public DbSet<Teko.Diary.Models.Diary> Diary { get; set; }
+		public DbSet<Teko.Diary.Models.Entry> Entry { get; set; }
+		public DbSet<Teko.Diary.Models.TagAssignment> TagAssignment { get; set; }
 	}
 }
